@@ -1,0 +1,5 @@
+flyway.user=
+flyway.password=
+flyway.schemas=
+flyway.url=
+flyway.cleanDisabled=
