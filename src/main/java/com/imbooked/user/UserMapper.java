@@ -1,5 +1,6 @@
 package com.imbooked.user;
 
+import com.imbooked.user.dto.UserDto;
 import com.imbooked.user.dto.UserRequest;
 import com.imbooked.user.dto.UserResponse;
 import org.mapstruct.*;
@@ -8,4 +9,5 @@ import org.mapstruct.*;
 public interface UserMapper {
     User toEntity(UserRequest request);
     UserResponse toUserResponse(User user);
+    UserDto toUserDto(User user);
 }
