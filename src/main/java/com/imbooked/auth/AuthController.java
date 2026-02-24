@@ -20,16 +20,12 @@ public class AuthController {
 
     @PostMapping
     public ResponseEntity<LoginResponse> loginUser(@RequestBody @Valid LoginRequest request, HttpServletResponse response) {
-        var refreshToken = jwtService.generateRefreshToken(request.email());
-
-        var cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/api/auth/refresh");
-        cookie.setMaxAge(jwtService.getRefreshTokenExpiration());
-        cookie.setSecure(true);
+        var jwtTokensResponse = authService.loginUser(request);
+        var cookie = authService.buildCookie(jwtTokensResponse.refreshToken());
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(authService.loginUser(request));
+        var loginResponse = new LoginResponse(jwtTokensResponse.email(), jwtTokensResponse.accessToken());
+        return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/refresh")

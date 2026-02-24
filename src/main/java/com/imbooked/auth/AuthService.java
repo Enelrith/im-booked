@@ -1,12 +1,13 @@
 package com.imbooked.auth;
 
 import com.imbooked.auth.dto.JwtResponse;
+import com.imbooked.auth.dto.JwtTokensResponse;
 import com.imbooked.auth.dto.LoginRequest;
-import com.imbooked.auth.dto.LoginResponse;
 import com.imbooked.user.UserMapper;
 import com.imbooked.user.UserRepository;
 import com.imbooked.user.dto.UserDto;
 import com.imbooked.user.exception.UserNotFoundException;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,13 +26,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public LoginResponse loginUser(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+    public JwtTokensResponse loginUser(LoginRequest request) {
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         log.info("User with email: {} logged in", request.email());
 
-        var accessToken = jwtService.generateAccessToken(request.email());
+        var user = userRepository.findUserByEmail(request.email()).orElseThrow(() -> new UserNotFoundException(request.email()));
+        var accessToken = jwtService.generateAccessToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
 
-        return new LoginResponse(request.email(), accessToken);
+        return new JwtTokensResponse(request.email(), accessToken, refreshToken);
     }
 
     public UserDto me() {
@@ -49,9 +52,19 @@ public class AuthService {
         var email = jwtService.getEmailFromToken(refreshToken);
         var user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
-        var accessToken = jwtService.generateAccessToken(user.getEmail());
+        var accessToken = jwtService.generateAccessToken(user);
         log.info("User with email: {} refreshed their access token", email);
 
         return new JwtResponse(accessToken);
+    }
+
+    public Cookie buildCookie(String refreshToken) {
+        var cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api/auth/refresh");
+        cookie.setMaxAge(jwtService.getRefreshTokenExpiration());
+        cookie.setSecure(true);
+
+        return cookie;
     }
 }

@@ -1,5 +1,8 @@
 package com.imbooked.auth;
 
+import com.imbooked.shared.enums.RoleName;
+import com.imbooked.user.Role;
+import com.imbooked.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class JwtService {
@@ -20,17 +24,20 @@ public class JwtService {
     @Getter
     private int refreshTokenExpiration;
 
-    public String generateAccessToken(String email) {
-        return generateToken(email, accessTokenExpiration);
+    public String generateAccessToken(User user) {
+        return generateToken(user, accessTokenExpiration);
     }
 
-    public String generateRefreshToken(String email) {
-        return generateToken(email, refreshTokenExpiration);
+    public String generateRefreshToken(User user) {
+        return generateToken(user, refreshTokenExpiration);
     }
 
-    private String generateToken(String email, long tokenExpiration) {
+    private String generateToken(User user, long tokenExpiration) {
+        var roles = user.getRoles().stream().map(Role::getName).toList();
+
         return Jwts.builder()
-                .subject(email)
+                .subject(user.getEmail())
+                .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
@@ -52,6 +59,17 @@ public class JwtService {
             var claims = getClaims(token);
 
             return claims.getSubject();
+        } catch (JwtException e) {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<RoleName> getRolesFromToken(String token) {
+        try {
+            var claims = getClaims(token);
+            var roles = (List<String>) claims.get("roles");
+            return roles.stream().map(RoleName::valueOf).toList();
         } catch (JwtException e) {
             return null;
         }
