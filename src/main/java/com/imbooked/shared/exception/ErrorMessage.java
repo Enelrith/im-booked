@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Slf4j
@@ -16,7 +16,7 @@ public class ErrorMessage {
     private String message;
     private String error;
     private String path;
-    private List<String> validationErrors;
+    private Map<String, String> validationErrors;
 
     public static ErrorMessage buildErrorMessage(Instant timestamp, Integer status, String message, String error, String path) {
         log.warn("An exception has occurred for path {}, status {}, message: {}, error: {}", path, status, message, error);
@@ -24,7 +24,7 @@ public class ErrorMessage {
         return new ErrorMessage(timestamp, status, message, error, path, null);
     }
 
-    public static ErrorMessage buildValidationErrorMessage(Instant timestamp, Integer status, String error, String path, List<String> validationErrors) {
+    public static ErrorMessage buildValidationErrorMessage(Instant timestamp, Integer status, String error, String path, Map<String, String> validationErrors) {
         log.warn("A validation error has occurred for path {}, status {}, error: {}, validation errors: {}", path, status, error, validationErrors);
 
         return new ErrorMessage(timestamp, status, "A validation error has occurred in one or more fields", error, path, validationErrors);
