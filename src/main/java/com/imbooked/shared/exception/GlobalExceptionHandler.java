@@ -36,7 +36,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessage> handleException(MethodArgumentNotValidException e, HttpServletRequest request) {
         var status = HttpStatus.BAD_REQUEST;
-        var errors = e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, DefaultMessageSourceResolvable::getDefaultMessage));
+        var errors = e.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(FieldError::getField, DefaultMessageSourceResolvable::getDefaultMessage, (existing, duplicate) -> existing));
         var response = buildValidationErrorMessage(Instant.now(), status.value(), status.getReasonPhrase(), request.getServletPath(), errors);
 
         return ResponseEntity.status(status).body(response);
