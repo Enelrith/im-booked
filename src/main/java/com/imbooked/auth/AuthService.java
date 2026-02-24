@@ -7,7 +7,6 @@ import com.imbooked.user.UserMapper;
 import com.imbooked.user.UserRepository;
 import com.imbooked.user.dto.UserDto;
 import com.imbooked.user.exception.UserNotFoundException;
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -58,13 +57,7 @@ public class AuthService {
         return new JwtResponse(accessToken);
     }
 
-    public Cookie buildCookie(String refreshToken) {
-        var cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/api/auth/refresh");
-        cookie.setMaxAge(jwtService.getRefreshTokenExpiration());
-        cookie.setSecure(true);
-
-        return cookie;
+    public void logoutUser(String refreshToken) {
+        if (!jwtService.validateToken(refreshToken)) throw new InvalidTokenException("Invalid refresh JWT token");
     }
 }

@@ -21,7 +21,7 @@ public class AuthController {
     @PostMapping
     public ResponseEntity<LoginResponse> loginUser(@RequestBody @Valid LoginRequest request, HttpServletResponse response) {
         var jwtTokensResponse = authService.loginUser(request);
-        var cookie = authService.buildCookie(jwtTokensResponse.refreshToken());
+        var cookie = buildCookie(jwtTokensResponse.refreshToken(), jwtService.getRefreshTokenExpiration());
         response.addCookie(cookie);
 
         var loginResponse = new LoginResponse(jwtTokensResponse.email(), jwtTokensResponse.accessToken());
@@ -36,5 +36,25 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> me() {
         return ResponseEntity.ok(authService.me());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logoutUser(@CookieValue(value = "refreshToken") String refreshToken, HttpServletResponse response) {
+        authService.logoutUser(refreshToken);
+
+        var cookie = buildCookie(null, 0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private Cookie buildCookie(String refreshToken, int expiration) {
+        var cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api/auth");
+        cookie.setMaxAge(expiration);
+        cookie.setSecure(true);
+
+        return cookie;
     }
 }
