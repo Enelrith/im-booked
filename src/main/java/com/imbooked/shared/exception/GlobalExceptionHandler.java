@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -66,6 +68,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleException(UserNotFoundException e, HttpServletRequest request) {
         var status = HttpStatus.BAD_REQUEST;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorMessage> handleException(BadCredentialsException e, HttpServletRequest request) {
+        var status = HttpStatus.UNAUTHORIZED;
         var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
 
         return ResponseEntity.status(status).body(response);
