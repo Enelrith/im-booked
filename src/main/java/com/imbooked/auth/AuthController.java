@@ -1,5 +1,6 @@
 package com.imbooked.auth;
 
+import com.imbooked.auth.dto.JwtResponse;
 import com.imbooked.auth.dto.LoginRequest;
 import com.imbooked.auth.dto.LoginResponse;
 import com.imbooked.user.dto.UserDto;
@@ -31,11 +32,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.loginUser(request));
     }
 
-    @PostMapping("/validate")
-    public boolean validateToken(@RequestHeader("Authorization") String authHeader) {
-        var token = authHeader.replace("Bearer ", "");
-
-        return jwtService.validateToken(token);
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@CookieValue(value = "refreshToken") String refreshToken) {
+        return ResponseEntity.ok(authService.refreshToken(refreshToken));
     }
 
     @GetMapping("/me")

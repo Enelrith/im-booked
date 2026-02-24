@@ -1,5 +1,6 @@
 package com.imbooked.auth;
 
+import com.imbooked.auth.dto.JwtResponse;
 import com.imbooked.auth.dto.LoginRequest;
 import com.imbooked.auth.dto.LoginResponse;
 import com.imbooked.user.UserMapper;
@@ -40,5 +41,17 @@ public class AuthService {
         var user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
         return userMapper.toUserDto(user);
+    }
+
+    public JwtResponse refreshToken(String refreshToken) {
+        if (!jwtService.validateToken(refreshToken)) throw new InvalidTokenException("Invalid refresh JWT token");
+
+        var email = jwtService.getEmailFromToken(refreshToken);
+        var user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+
+        var accessToken = jwtService.generateAccessToken(user.getEmail());
+        log.info("User with email: {} refreshed their access token", email);
+
+        return new JwtResponse(accessToken);
     }
 }
