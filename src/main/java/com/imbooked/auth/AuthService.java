@@ -28,7 +28,7 @@ public class AuthService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         log.info("User with email: {} logged in", request.email());
 
-        var accessToken = jwtService.generateToken(request.email());
+        var accessToken = jwtService.generateAccessToken(request.email());
 
         return new LoginResponse(request.email(), accessToken);
     }

@@ -3,29 +3,36 @@ package com.imbooked.auth;
 import com.imbooked.auth.dto.LoginRequest;
 import com.imbooked.auth.dto.LoginResponse;
 import com.imbooked.user.dto.UserDto;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Slf4j
 public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
     @PostMapping
-    public ResponseEntity<LoginResponse> loginUser(@RequestBody @Valid LoginRequest request) {
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody @Valid LoginRequest request, HttpServletResponse response) {
+        var refreshToken = jwtService.generateRefreshToken(request.email());
+
+        var cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api/auth/refresh");
+        cookie.setMaxAge(jwtService.getRefreshTokenExpiration());
+        cookie.setSecure(true);
+        response.addCookie(cookie);
 
         return ResponseEntity.ok(authService.loginUser(request));
     }
 
     @PostMapping("/validate")
     public boolean validateToken(@RequestHeader("Authorization") String authHeader) {
-        log.info("Validate called");
         var token = authHeader.replace("Bearer ", "");
 
         return jwtService.validateToken(token);
