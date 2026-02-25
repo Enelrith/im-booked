@@ -53,7 +53,7 @@ public class AuthController {
         cookie.setHttpOnly(true);
         cookie.setPath("/api/auth");
         cookie.setMaxAge(expiration);
-        cookie.setSecure(true);
+        cookie.setSecure(false); //TODO: Change this to true after deployment
 
         return cookie;
     }
