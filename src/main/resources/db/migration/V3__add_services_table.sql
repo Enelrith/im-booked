@@ -7,5 +7,5 @@ create table services(
     business_id binary(16) not null,
     constraint ck_services_price_positive_or_zero check (price >= 0),
     constraint ck_services_duration_minutes_positive check (duration_minutes > 0),
-    constraint fk_services_businesses foreign key (business_id) references businesses (id)
-)
+    constraint fk_services_businesses foreign key (business_id) references businesses (id) on delete cascade
+);
