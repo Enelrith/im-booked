@@ -8,6 +8,10 @@ import org.mapstruct.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserMapper {
     User toEntity(UserRequest request);
+
     UserResponse toUserResponse(User user);
+
     UserDto toUserDto(User user);
+
+    User toEntity(UserDto userDto);
 }

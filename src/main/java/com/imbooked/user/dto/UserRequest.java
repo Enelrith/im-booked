@@ -1,9 +1,7 @@
 package com.imbooked.user.dto;
 
-import com.imbooked.user.exception.PasswordsDoNotMatchException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UserRequest(

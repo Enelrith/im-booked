@@ -1,5 +1,7 @@
 package com.imbooked.user;
 
+import com.imbooked.business.dto.AddBusinessRequest;
+import com.imbooked.business.dto.BusinessDto;
 import com.imbooked.user.dto.UserRequest;
 import com.imbooked.user.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -37,5 +39,16 @@ public class UserController {
         var user = userService.getUserById(id);
 
         return ResponseEntity.ok().body(user);
+    }
+
+    @PostMapping("/businesses")
+    public ResponseEntity<BusinessDto> addBusiness(@RequestBody @Valid AddBusinessRequest request) {
+        var business = userService.addBusiness(request);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(business.id())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 }

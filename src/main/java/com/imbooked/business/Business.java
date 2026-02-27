@@ -1,6 +1,6 @@
-package com.imbooked.user;
+package com.imbooked.business;
 
-import com.imbooked.business.Business;
+import com.imbooked.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,28 +11,41 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Table(name = "businesses")
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@Table(name = "users")
-public class User {
+public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "BINARY(16)", nullable = false, updatable = false, unique = true)
     private UUID id;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(name = "phone", nullable = true, length = 20)
+    private String phone;
+
+    @Column(name = "description", nullable = true)
+    private String description;
+
+    @Column(name = "address", nullable = true)
+    private String address;
+
+    @Column(name = "country", nullable = true)
+    private String country;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -42,19 +55,7 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "role_id", nullable = false)
-    )
-    private Set<Role> roles = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    private Set<Business> businesses = new HashSet<>();
-
-    public void addBusiness(Business business) {
-        business.setUser(this);
-        getBusinesses().add(business);
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

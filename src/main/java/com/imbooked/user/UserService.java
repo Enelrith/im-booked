@@ -1,5 +1,10 @@
 package com.imbooked.user;
 
+import com.imbooked.business.BusinessMapper;
+import com.imbooked.business.dto.AddBusinessRequest;
+import com.imbooked.business.dto.BusinessDto;
+import com.imbooked.business.exception.BusinessEmailAlreadyInUseException;
+import com.imbooked.shared.SecurityUtils;
 import com.imbooked.shared.config.PasswordEncoderConfig;
 import com.imbooked.shared.enums.RoleName;
 import com.imbooked.user.dto.UserRequest;
@@ -27,6 +32,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final BusinessMapper businessMapper;
     private final PasswordEncoderConfig passwordEncoderConfig;
 
     @Transactional
@@ -52,10 +58,34 @@ public class UserService implements UserDetailsService {
         return userMapper.toUserResponse(user);
     }
 
+    @Transactional
+    public BusinessDto addBusiness(AddBusinessRequest request) {
+        var userEmail = SecurityUtils.getCurrentUserEmail();
+        var user = userRepository.findUserByEmailWithBusinesses(userEmail).orElseThrow(() -> new UserNotFoundException(userEmail));
+
+        user.getBusinesses().forEach(business -> {
+            if (business.getEmail().equals(request.email())) {
+                throw new BusinessEmailAlreadyInUseException();
+            }
+        });
+
+        var business = businessMapper.toEntity(request);
+        user.addBusiness(business);
+        log.info("User with email: {} created business: {}", userEmail, business.getName());
+
+        var roleNames = user.getRoles().stream().map(Role::getName).toList();
+        if (!roleNames.contains(RoleName.BUSINESS_OWNER)) addUserRole(user, RoleName.BUSINESS_OWNER);
+
+        userRepository.flush();
+
+        return businessMapper.toBusinessDto(business);
+    }
+
     private void addUserRole(User user, RoleName roleName) {
         var role = roleRepository.findByName(roleName).orElseThrow(() -> new RoleDoesNotExistException(roleName));
 
         user.getRoles().add(role);
+        log.info("Role: {} has been added to user with email: {}", roleName, user.getEmail());
     }
 
     @Override

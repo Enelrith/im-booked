@@ -1,6 +1,8 @@
 package com.imbooked.shared.exception;
 
 import com.imbooked.auth.InvalidTokenException;
+import com.imbooked.business.exception.BusinessEmailAlreadyInUseException;
+import com.imbooked.business.exception.BusinessNotFoundException;
 import com.imbooked.user.exception.EmailAlreadyInUseException;
 import com.imbooked.user.exception.PasswordsDoNotMatchException;
 import com.imbooked.user.exception.RoleDoesNotExistException;
@@ -69,7 +71,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleException(UserNotFoundException e, HttpServletRequest request) {
-        var status = HttpStatus.BAD_REQUEST;
+        var status = HttpStatus.NOT_FOUND;
         var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
 
         return ResponseEntity.status(status).body(response);
@@ -86,6 +88,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorMessage> handleException(InvalidTokenException e, HttpServletRequest request) {
         var status = HttpStatus.UNAUTHORIZED;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(BusinessEmailAlreadyInUseException.class)
+    public ResponseEntity<ErrorMessage> handleException(BusinessEmailAlreadyInUseException e, HttpServletRequest request) {
+        var status = HttpStatus.CONFLICT;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(BusinessNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleException(BusinessNotFoundException e, HttpServletRequest request) {
+        var status = HttpStatus.NOT_FOUND;
         var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
 
         return ResponseEntity.status(status).body(response);
