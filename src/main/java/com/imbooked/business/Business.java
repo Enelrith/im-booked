@@ -1,5 +1,6 @@
 package com.imbooked.business;
 
+import com.imbooked.service.Service;
 import com.imbooked.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -58,4 +60,7 @@ public class Business {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    private Set<Service> services;
 }
