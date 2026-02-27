@@ -61,6 +61,6 @@ public class Business {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Set<Service> services;
 }
