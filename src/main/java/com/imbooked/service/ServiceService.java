@@ -5,6 +5,8 @@ import com.imbooked.business.BusinessRepository;
 import com.imbooked.business.exception.BusinessNotFoundException;
 import com.imbooked.service.dto.AddServiceRequest;
 import com.imbooked.service.dto.ServiceDto;
+import com.imbooked.service.dto.UpdateServiceRequest;
+import com.imbooked.service.exception.ServiceNotFoundException;
 import com.imbooked.shared.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,24 @@ public class ServiceService {
         serviceRepository.flush();
 
         return serviceMapper.toServiceDto(service);
+    }
+
+    @Transactional
+    public ServiceDto updateService(UUID serviceId, UpdateServiceRequest request) {
+        var service = serviceRepository.findByIdAndBusiness_User_Email(serviceId, SecurityUtils.getCurrentUserEmail())
+                .orElseThrow(() -> new ServiceNotFoundException(serviceId));
+
+        serviceMapper.updateService(request, service);
+        serviceRepository.flush();
+
+        return serviceMapper.toServiceDto(service);
+    }
+
+    @Transactional
+    public void deleteService(UUID serviceId) {
+        var service = serviceRepository.findByIdAndBusiness_User_Email(serviceId, SecurityUtils.getCurrentUserEmail())
+                .orElseThrow(() -> new ServiceNotFoundException(serviceId));
+        serviceRepository.delete(service);
     }
 
     public Set<ServiceDto> getServicesByBusinessId(UUID businessId) {

@@ -3,6 +3,7 @@ package com.imbooked.shared.exception;
 import com.imbooked.auth.InvalidTokenException;
 import com.imbooked.business.exception.BusinessEmailAlreadyInUseException;
 import com.imbooked.business.exception.BusinessNotFoundException;
+import com.imbooked.service.exception.ServiceNotFoundException;
 import com.imbooked.user.exception.EmailAlreadyInUseException;
 import com.imbooked.user.exception.PasswordsDoNotMatchException;
 import com.imbooked.user.exception.RoleDoesNotExistException;
@@ -103,6 +104,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleException(BusinessNotFoundException e, HttpServletRequest request) {
+        var status = HttpStatus.NOT_FOUND;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(ServiceNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleException(ServiceNotFoundException e, HttpServletRequest request) {
         var status = HttpStatus.NOT_FOUND;
         var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
 
