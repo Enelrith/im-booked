@@ -1,5 +1,6 @@
 package com.imbooked.business;
 
+import com.imbooked.appointment.Appointment;
 import com.imbooked.service.Service;
 import com.imbooked.user.User;
 import jakarta.persistence.*;
@@ -63,4 +64,7 @@ public class Business {
 
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Set<Service> services;
+
+    @OneToMany(mappedBy = "business", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private Set<Appointment> appointments;
 }
