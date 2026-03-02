@@ -1,7 +1,7 @@
 package com.imbooked.appointment;
 
 public enum AppointmentStatus {
-    PENDING,
+    SCHEDULED,
     COMPLETED,
     CANCELLED
 }

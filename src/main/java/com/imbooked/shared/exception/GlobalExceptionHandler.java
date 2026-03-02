@@ -1,5 +1,8 @@
 package com.imbooked.shared.exception;
 
+import com.imbooked.appointment.exception.AppointmentNotFoundException;
+import com.imbooked.appointment.exception.ConflictingAppointmentTimeException;
+import com.imbooked.appointment.exception.InvalidAppointmentTimeException;
 import com.imbooked.auth.InvalidTokenException;
 import com.imbooked.business.exception.BusinessEmailAlreadyInUseException;
 import com.imbooked.business.exception.BusinessNotFoundException;
@@ -113,6 +116,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceNotFoundException.class)
     public ResponseEntity<ErrorMessage> handleException(ServiceNotFoundException e, HttpServletRequest request) {
         var status = HttpStatus.NOT_FOUND;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(ConflictingAppointmentTimeException.class)
+    public ResponseEntity<ErrorMessage> handleException(ConflictingAppointmentTimeException e, HttpServletRequest request) {
+        var status = HttpStatus.CONFLICT;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(AppointmentNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleException(AppointmentNotFoundException e, HttpServletRequest request) {
+        var status = HttpStatus.NOT_FOUND;
+        var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(InvalidAppointmentTimeException.class)
+    public ResponseEntity<ErrorMessage> handleException(InvalidAppointmentTimeException e, HttpServletRequest request) {
+        var status = HttpStatus.BAD_REQUEST;
         var response = buildErrorMessage(Instant.now(), status.value(), e.getMessage(), status.getReasonPhrase(), request.getServletPath());
 
         return ResponseEntity.status(status).body(response);

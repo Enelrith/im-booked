@@ -18,5 +18,8 @@ spring:
     secret: ${JWT_SECRET}
     access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
     refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
   frontend:
     url: ${FRONTEND_URL}
