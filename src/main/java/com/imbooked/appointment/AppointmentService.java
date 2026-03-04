@@ -13,6 +13,8 @@ import com.imbooked.service.ServiceRepository;
 import com.imbooked.shared.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +90,12 @@ public class AppointmentService {
                 .orElseThrow(() -> new AppointmentNotFoundException(appointmentId));
         appointmentRepository.delete(appointment);
         log.info("Deleted appointment with id: {}", appointmentId);
+    }
+
+    public Page<AppointmentDto> getAppointments(UUID businessId, Pageable pageable) {
+        var appointments = appointmentRepository.findAllByBusinessIdAndBusiness_User_Email(businessId,
+                SecurityUtils.getCurrentUserEmail(), pageable);
+        return appointments.map(appointmentMapper::toAppointmentDto);
     }
 
     private void addAppointmentToBusinessAndService(Business business, com.imbooked.service.Service service,

@@ -5,6 +5,10 @@ import com.imbooked.appointment.dto.AppointmentDto;
 import com.imbooked.appointment.dto.UpdateAppointmentRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,5 +47,13 @@ public class AppointmentController {
         appointmentService.deleteAppointment(appointmentId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{businessId}")
+    public ResponseEntity<Page<AppointmentDto>> getAppointments(@PathVariable UUID businessId,
+                                                                @RequestParam(defaultValue = "0") int pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber, 10, Sort.by("status").descending()
+                .and(Sort.by("appointmentStart").ascending()));
+        return ResponseEntity.ok(appointmentService.getAppointments(businessId, pageable));
     }
 }
