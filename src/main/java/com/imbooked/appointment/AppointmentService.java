@@ -3,6 +3,7 @@ package com.imbooked.appointment;
 import com.imbooked.appointment.dto.AddAppointmentRequest;
 import com.imbooked.appointment.dto.AppointmentDto;
 import com.imbooked.appointment.dto.UpdateAppointmentRequest;
+import com.imbooked.appointment.dto.UpdateAppointmentStatusRequest;
 import com.imbooked.appointment.exception.AppointmentNotFoundException;
 import com.imbooked.appointment.exception.ConflictingAppointmentTimeException;
 import com.imbooked.appointment.exception.InvalidAppointmentTimeException;
@@ -96,6 +97,17 @@ public class AppointmentService {
         var appointments = appointmentRepository.findAllByBusinessIdAndBusiness_User_Email(businessId,
                 SecurityUtils.getCurrentUserEmail(), pageable);
         return appointments.map(appointmentMapper::toAppointmentDto);
+    }
+
+    @Transactional
+    public AppointmentDto updateAppointmentStatus(UUID appointmentId, UpdateAppointmentStatusRequest request) {
+        var appointment = appointmentRepository.findByIdAndBusiness_User_Email(appointmentId, SecurityUtils.getCurrentUserEmail())
+                .orElseThrow(() -> new AppointmentNotFoundException(appointmentId));
+
+        appointmentMapper.partialUpdate(request, appointment);
+        appointmentRepository.flush();
+
+        return appointmentMapper.toAppointmentDto(appointment);
     }
 
     private void addAppointmentToBusinessAndService(Business business, com.imbooked.service.Service service,

@@ -3,6 +3,7 @@ package com.imbooked.appointment;
 import com.imbooked.appointment.dto.AddAppointmentRequest;
 import com.imbooked.appointment.dto.AppointmentDto;
 import com.imbooked.appointment.dto.UpdateAppointmentRequest;
+import com.imbooked.appointment.dto.UpdateAppointmentStatusRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,5 +56,11 @@ public class AppointmentController {
         Pageable pageable = PageRequest.of(pageNumber, 10, Sort.by("status").descending()
                 .and(Sort.by("appointmentStart").ascending()));
         return ResponseEntity.ok(appointmentService.getAppointments(businessId, pageable));
+    }
+
+    @PatchMapping("/{appointmentId}/status")
+    public ResponseEntity<AppointmentDto> updateAppointmentStatus(@PathVariable UUID appointmentId,
+                                                                  @RequestBody UpdateAppointmentStatusRequest request) {
+        return ResponseEntity.ok(appointmentService.updateAppointmentStatus(appointmentId, request));
     }
 }

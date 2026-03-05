@@ -3,6 +3,7 @@ package com.imbooked.appointment;
 import com.imbooked.appointment.dto.AddAppointmentRequest;
 import com.imbooked.appointment.dto.AppointmentDto;
 import com.imbooked.appointment.dto.UpdateAppointmentRequest;
+import com.imbooked.appointment.dto.UpdateAppointmentStatusRequest;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
@@ -19,4 +20,11 @@ public interface AppointmentMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Appointment partialUpdate(UpdateAppointmentRequest updateAppointmentRequest, @MappingTarget Appointment appointment);
+
+    Appointment toEntity(UpdateAppointmentStatusRequest updateAppointmentStatusRequest);
+
+    UpdateAppointmentStatusRequest toUpdateAppointmentStatusDto(Appointment appointment);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Appointment partialUpdate(UpdateAppointmentStatusRequest updateAppointmentStatusRequest, @MappingTarget Appointment appointment);
 }
