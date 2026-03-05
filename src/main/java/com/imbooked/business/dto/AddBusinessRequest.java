@@ -16,6 +16,8 @@ public record AddBusinessRequest(
         String description,
         @Size(message = "The address must be between {min} and {max} characters long", min = 1, max = 255)
         String address,
+        @Size(message = "The city must be between {min} and {max} characters long", min = 1, max = 255)
+        String city,
         @Size(message = "The country must be between {min} and {max} characters long", min = 1, max = 255)
         String country,
         @NotNull(message = "isActive cannot be null")

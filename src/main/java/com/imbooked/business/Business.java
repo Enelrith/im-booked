@@ -44,6 +44,9 @@ public class Business {
     @Column(name = "address", nullable = true)
     private String address;
 
+    @Column(name = "city", nullable = true)
+    private String city;
+
     @Column(name = "country", nullable = true)
     private String country;
 
