@@ -12,4 +12,6 @@ public interface BusinessRepository extends JpaRepository<Business, UUID> {
 
     @EntityGraph(attributePaths = {"services"})
     Set<Business> findAllByUser_Email(String userEmail);
+
+    boolean existsByIdAndUser_Email(UUID id, String userEmail);
 }
